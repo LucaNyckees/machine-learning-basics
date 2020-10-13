@@ -29,21 +29,26 @@ def least_squares_SGD(y, tx, initial_w, batch_size, max_iters, gamma):
 
 def least_squares(y, tx):
     N=y.shape[0]
-    X=tx.T
+    X=tx
     A = np.linalg.inv(X.T.dot(X))
-    w = (A.dot(X)).dot(y)
-    errors = (y-X.cdot(w))**2
+    w = (A.dot(X.T)).dot(y)
+    errors = (y-X.dot(w))**2
     MSE = np.sum(errors)/N
     return w, MSE
 
 def ridge_regression(y, tx, lambda_):
-    lambda_prime = 2*y.len()*lambda_
-    X = tx.T
-    A = tx.dot(X) + lambda_prime*np.eyes(tx.shape[0])
-    B = A.inv()
-    w = B.dot(tx.dot(y))
+    lambda_prime = 2*y.shape[0]*lambda_
+    X = tx
+    A = X.T.dot(X) + lambda_prime*np.eye(X.shape[1])
+    B = np.linalg.inv(A)
+    w = B.dot(X.T.dot(y))
     loss = y - X.dot(w)
     return w,loss
+
+
+
+
+
 
 
 
