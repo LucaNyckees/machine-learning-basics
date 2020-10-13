@@ -5,13 +5,13 @@ Created on Fri Oct  2 15:45:53 2020
 
 @author: nyckeesluca
 """
-from helpers import *
+from proj1_helpers import *
 from costs import *
 
 def compute_stochastic_gradient(y, tx, w):
     error = y-tx.dot(w)
     N=len(y)
-    X=tx.T
+    X=tx
     gradient = -X.dot(error)/N
     return gradient
 
@@ -24,5 +24,11 @@ def least_squares_SGD(y, tx, initial_w, batch_size, max_iters, gamma):
             loss = compute_loss(minibatch_y, minibatch_tx, w)
             w = w-gamma*gradient
     return w,loss
+
+
+
+
+
+
 
 
