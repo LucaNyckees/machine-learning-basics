@@ -19,5 +19,5 @@ def least_squares(y, tx):
     #errors = (y-X.cdot(w))**2
     #MSE = np.sum(errors)/N
     #return w, MSE
-    return y-X.cdot(w)
+    return w,y-X.cdot(w)
     
