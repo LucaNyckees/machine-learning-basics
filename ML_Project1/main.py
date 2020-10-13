@@ -4,8 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plots
 import numpy.matlib
 import datetime 
-from gradient_descent import *
-from stochastic_gradient_descent import *
 
 from proj1_helpers import *
 DATA_TRAIN_PATH = 'train.csv' # TODO: download train data and supply path here 
@@ -21,10 +19,6 @@ create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
 
 y,tx=build_model_data(y_pred,tX_test)
 
-"""print(tx)
-print(y)
-"""
-
 
 
 from implementations import *
@@ -33,16 +27,33 @@ from implementations import *
 max_iters = 50
 gamma = 0.7
 batch_size = 1
+lambda_=0.001
 
 # Initialization
 w_initial = np.zeros(31)
 
+# Results of the implemented functions
+
 w_GD=least_squares_GD(y, tx, w_initial, max_iters, gamma)[0]
 loss_GD=least_squares_GD(y, tx, w_initial, max_iters, gamma)[1]
 
-print('w_GD=',w_GD,'\n','loss_GD=',loss_GD)
+print('w_GD =',w_GD,'\n','loss_GD =',loss_GD)
 
 w_SGD=least_squares_SGD(y, tx, w_initial, max_iters, batch_size, gamma)[0]
 loss_SGD=least_squares_SGD(y, tx, w_initial, max_iters, batch_size, gamma)[1]
 
-print('w_SGD=',w_SGD,'\n','loss_SGD=',loss_SGD)
+print('w_SGD =',w_SGD,'\n','loss_SGD =',loss_SGD)
+
+
+w_LS=least_squares(y, tx)[0]
+MSE_LS=least_squares(y, tx)[1]
+
+print('w_LS =',w_LS,'\n','MSE_LS =',MSE_LS)
+
+
+w_RR=ridge_regression(y, tx, lambda_)[0]
+loss_RR=ridge_regression(y, tx, lambda_)[1]
+
+print('w_RR =',w_RR,'\n','loss_RR =',loss_RR)
+
+
