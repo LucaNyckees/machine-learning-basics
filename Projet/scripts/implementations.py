@@ -2,12 +2,10 @@
 """ML methods"""
 import numpy as np
 
-def compute_loss(y, tx, w):
+def compute_mse(y, tx, w):
     """Compute the MSE"""
-    error= y - np.dot(tx,w)
-    N=y.shape[0]
-    loss = (1/2*N)*np.dot(error,error)
-    return loss 
+    e=y-tx.dot(w)
+    return e.dot(e)/(2*len(e))
 
 def compute_gradient(y, tx, w):
     e = y - np.dot(tx,w)
