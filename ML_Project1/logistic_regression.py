@@ -38,7 +38,7 @@ def logistic_regression(y,tx,initial_w,max_iters,gamma):
     w=0
     loss=0
     for i in range(max_iters):
-        w,loss=learning_by_gradient_descent(y, tx, w, gamma)[0]
+        w,loss=learning_by_gradient_descent(y, tx, w, gamma)
     return w,loss
 
 
