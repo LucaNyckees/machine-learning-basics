@@ -5,7 +5,10 @@ def reg_calculate_gradient(y, tx, lambda_, w):
     g=0
     X=tx
     for i in range(y.shape[0]):
-        g=g-y[i]*X[:,i]+X[:,i].dot(sigmoid(X[i,:].dot(w)))
+        xi=X[i,:]
+        g=g-y[i]*xi
+        product=sigmoid(xi.T.dot(w))
+        g=g+xi.dot(product)
     g=g+0.5*lambda_*w
     return g
 
