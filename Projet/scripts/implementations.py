@@ -2,7 +2,7 @@
 """ML methods"""
 import numpy as np
 
-def compute_mse(y, tx, w):
+def compute_loss(y, tx, w):
     """Compute the MSE"""
     e=y-tx.dot(w)
     return e.dot(e)/(2*len(e))
