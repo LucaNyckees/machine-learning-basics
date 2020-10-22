@@ -10,7 +10,13 @@ def compute_loss(y, tx, w):
 def compute_gradient(y, tx, w):
     e = y - np.dot(tx,w)
     N= y.shape[0]
-    return -np.dot(e,tx)/N 
+    return -np.dot(e,tx)/N
+
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    a=np.repeat(x[:, np.newaxis],degree+1,axis=1) #POUR METTRE ARRAY EN COLONE x[:,np.newaxis]
+    b=np.arange(degree+1)
+    return np.power(a,b)
 
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
