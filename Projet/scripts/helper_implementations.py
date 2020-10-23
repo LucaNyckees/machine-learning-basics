@@ -12,11 +12,12 @@ def compute_loss_SGD(y, tx, w):
     e=y-tx.dot(w)
     return e*e/2
 
-def compute_gradient(y, tx, w):
+def compute_gradient_SGD(y, tx, w):
     """Compute the gradient"""
-    e = y - np.dot(tx,w)
-    N= y.shape[0]
-    return -np.dot(e,tx)/N
+    error = y-tx.dot(w)
+    N=len(y)
+    gradient = -tx.T.dot(error)/N
+    return gradient
 
 def compute_gradient_SGD(y, tx, w):
     """Compute the gradient"""
