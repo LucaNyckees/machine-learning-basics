@@ -3,18 +3,23 @@
 
 
 import numpy as np
-from implementations import compute_loss
-from implementations import least_squares_GD
-from implementations import build_poly
+from implementations import *
 import matplotlib.pyplot as plt
 
 
 
-def cross_validation_visualization(lambds, mse_tr, mse_te):
+def cross_validation_visualization(lambds, mse_tr, mse_te,choice):
     """visualization the curves of mse_tr and mse_te."""
-    plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
-    plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
-    plt.xlabel("lambda")
+    if choice == 'semilogy':
+        plt.semilogy(lambds, mse_tr, marker=".", color='b', label='train error')
+        plt.semilogy(lambds, mse_te, marker=".", color='r', label='test error')
+    elif choice == 'semilogx':
+        plt.semilogx(lambds, mse_tr, marker=".", color='b', label='train error')
+        plt.semilogx(lambds, mse_te, marker=".", color='r', label='test error')
+    else:
+        raise SyntaxWarning
+        
+    plt.xlabel("hyperparameter")
     plt.ylabel("rmse")
     plt.title("cross validation")
     plt.legend(loc=2)
@@ -34,8 +39,8 @@ def build_k_indices(y, k_fold, seed):
 
 
 
-def cross_validation(y, x, k_indices, k, initial_w, max_iters, gamma, degree):
-    """return the loss of ridge regression."""
+def cross_validation(y, x, k_indices, k,method, initial_w, max_iters, gamma, lambda_ ,degree):
+    """Return the loss of the k th fold"""
    
     # get k'th subgroup in test, others in train
     
@@ -52,12 +57,22 @@ def cross_validation(y, x, k_indices, k, initial_w, max_iters, gamma, degree):
     x_te=build_poly(x_te,degree)
     x_tr=build_poly(x_tr,degree)
 
-    # ridge regression
-    
-    _,mse_te=least_squares_GD(y_te , x_te , initial_w , max_iters , gamma)
-    w,mse_tr=least_squares_GD(y_tr , x_tr , initial_w , max_iters , gamma)
-    
-
+    # Methods
+    if method == 'GD':
+        _,mse_te=least_squares_GD(y_te , x_te , initial_w , max_iters , gamma)
+        w,mse_tr=least_squares_GD(y_tr , x_tr , initial_w , max_iters , gamma)
+    elif method == 'SGD':
+        _,mse_te=least_squares_SGD(y_te , x_te , initial_w , max_iters , gamma)
+        w,mse_tr=least_squares_SGD(y_tr , x_tr , initial_w , max_iters , gamma)
+    elif method == 'LS':
+        _,mse_te=least_squares(y_te, x_te)
+        w,mse_tr=least_squares(y_tr, x_tr)
+    elif method == 'RR':
+        _,mse_te=ridge_regression(y_te, x_te, lambda_)
+        w,mse_tr=ridge_regression(y_tr, x_tr, lambda_)
+    else:
+        raise SyntaxWarning
+        
     # calculate the loss for train and test data
     
     loss_te=compute_loss(y_te,x_te,w)
@@ -65,25 +80,122 @@ def cross_validation(y, x, k_indices, k, initial_w, max_iters, gamma, degree):
 
     return loss_tr, loss_te
 
-def cross_validation_demo(y,x,initial_w,max_iters):
+def cross_validation_GD_SGD(y, x, k_fold, max_degree,gamma, max_iters,method):
+    """"Cross validation for gradient descent to find best degree and gamma"""
+    if method != 'SGD' and method != 'GD':
+        raise SyntaxWarning
+    lambda_=0
     seed = 1
-    degree = 7
-    k_fold = 4
-    gamma = np.logspace(-4, 0, 30)
+    degrees = np.arange(1,max_degree+1)
+    best_gamma = []
+    best_rmses = []
+    
+    # split data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+    for d in degrees:
+        print('degree = ',d)
+        initial_w=np.zeros(x.shape[1]*d+1)
+        # define lists to store the loss of training data and test data
+        rmse_tr = []
+        rmse_te = []
+        # cross validation
+        for i in gamma:
+            print('nb gamma = ',i)
+            rmse_tr_tmp = []
+            rmse_te_tmp = []
+            for k in range(k_fold):
+                loss_tr, loss_te=cross_validation(y,x,k_indices,k,method,initial_w,max_iters,i,lambda_,d)
+                rmse_tr_tmp.append(loss_tr)
+                rmse_te_tmp.append(loss_te)
+            rmse_tr.append(np.mean(rmse_tr_tmp))
+            rmse_te.append(np.mean(rmse_te_tmp))
+        #grid search for the best hyperparameters
+        ind_gamma_opt = np.argmin(rmse_te)
+        best_gamma.append(gamma[ind_gamma_opt])
+        best_rmses.append(rmse_te[ind_gamma_opt])
+        
+        
+    ind_best_degree=np.argmin(best_rmses)
+    
+    return degrees[ind_best_degree], best_gamma[ind_best_degree]
+
+
+
+def cross_validation_LS(y,x,k_fold,max_degree):
+    """"Cross validation for least square with normal equations to find best degree"""
+    seed = 1
+    initial_w=0
+    max_iters=0
+    gamma=0
+    lambda_=0
+    degrees = np.arange(1,max_degree+1)
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
     # define lists to store the loss of training data and test data
     rmse_tr = []
     rmse_te = []
     # cross validation
-    for i in gamma:
+    for d in degrees:
+        print('degree = ',d)
         rmse_tr_tmp = []
         rmse_te_tmp = []
         for k in range(k_fold):
-            loss_tr, loss_te=cross_validation(y,x,k_indices,k,initial_w,max_iters,i,degree)
+            loss_tr, loss_te=cross_validation(y, x, k_indices, k,'LS', initial_w, max_iters, gamma, lambda_,d)
             rmse_tr_tmp.append(loss_tr)
             rmse_te_tmp.append(loss_te)
         rmse_tr.append(np.mean(rmse_tr_tmp))
         rmse_te.append(np.mean(rmse_te_tmp))
+        
+    #grid search for the best hyperparameters
+    index_best_degree=np.argmin(rmse_te)
     
-    cross_validation_visualization(gamma, rmse_tr, rmse_te)
+    cross_validation_visualization(degrees, rmse_tr, rmse_te,'semilogy')
+    
+    return degrees[index_best_degree]
+
+def cross_validation_RR(y, x, k_fold, max_degree, lambdas):
+    """"Cross validation for ridge regression to find best degree and lambda"""
+
+    seed = 1
+    initial_w=0
+    max_iters=0
+    gamma=0
+    degrees = np.arange(1,max_degree+1)
+   
+    best_lambdas = []
+    best_rmses = []
+    
+    # split data in k fold
+    k_indices = build_k_indices(y, k_fold, seed)
+    for d in degrees:
+        print('degree = ',d)
+        initial_w=np.zeros(x.shape[1]*d+1)
+        # define lists to store the loss of training data and test data
+        rmse_tr = []
+        rmse_te = []
+        # cross validation
+        for i in lambdas:
+            print('nb gamma = ',i)
+            rmse_tr_tmp = []
+            rmse_te_tmp = []
+            for k in range(k_fold):
+                loss_tr, loss_te=cross_validation(y,x,k_indices,k,'RR',initial_w,max_iters,gamma,i,d)
+                rmse_tr_tmp.append(loss_tr)
+                rmse_te_tmp.append(loss_te)
+            rmse_tr.append(np.mean(rmse_tr_tmp))
+            rmse_te.append(np.mean(rmse_te_tmp))
+        #grid search for the best hyperparameters
+        ind_lambda_opt = np.argmin(rmse_te)
+        best_lambdas.append(lambdas[ind_lambda_opt])
+        best_rmses.append(rmse_te[ind_lambda_opt])
+        
+        
+    ind_best_degree=np.argmin(best_rmses)
+    
+    return degrees[ind_best_degree], best_lambdas[ind_best_degree]
+    
+   
+
+
+
+
