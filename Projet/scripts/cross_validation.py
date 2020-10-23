@@ -62,8 +62,8 @@ def cross_validation(y, x, k_indices, k,method, initial_w, max_iters, gamma, lam
         _,mse_te=least_squares_GD(y_te , x_te , initial_w , max_iters , gamma)
         w,mse_tr=least_squares_GD(y_tr , x_tr , initial_w , max_iters , gamma)
     elif method == 'SGD':
-        _,mse_te=least_squares_SGD_bis(y_te , x_te , initial_w , max_iters , gamma)
-        w,mse_tr=least_squares_SGD_bis(y_tr , x_tr , initial_w , max_iters , gamma)
+        _,mse_te=least_squares_SGD(y_te , x_te , initial_w , max_iters , gamma)
+        w,mse_tr=least_squares_SGD(y_tr , x_tr , initial_w , max_iters , gamma)
     elif method == 'LS':
         _,mse_te=least_squares(y_te, x_te)
         w,mse_tr=least_squares(y_tr, x_tr)

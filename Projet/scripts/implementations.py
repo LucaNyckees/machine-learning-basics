@@ -16,22 +16,12 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     """Stochastic gradient descent algorithm."""
     w = initial_w
     for n_iter in range(max_iters):
-        for minibatch_y, minibatch_tx in batch_iter(y, tx, 1):
-            gradient = compute_gradient(minibatch_y, minibatch_tx, w)
-            w = w-gamma*gradient
-        loss = compute_loss(minibatch_y, minibatch_tx, w)
-    return w,loss
-
-def least_squares_SGD_bis(y, tx, initial_w, max_iters, gamma):
-    """Stochastic gradient descent algorithm."""
-    w = initial_w
-    for n_iter in range(max_iters):
         i=np.random.randint(0,tx.shape[0])
         minibatch_y=[y[i]]
         minibatch_tx=np.array([tx[i,:]])
-        gradient = compute_gradient_SGD(minibatch_y, minibatch_tx, w)
+        gradient = compute_gradient(minibatch_y, minibatch_tx, w)
         w = w-gamma*gradient
-        loss = compute_loss_SGD(minibatch_y, minibatch_tx, w)
+        loss = compute_loss(minibatch_y, minibatch_tx, w)
     return w,loss
 
 def least_squares(y, tx):
