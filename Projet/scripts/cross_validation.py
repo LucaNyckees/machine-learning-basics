@@ -62,14 +62,17 @@ def cross_validation(y, x, k_indices, k,method, initial_w, max_iters, gamma, lam
         _,mse_te=least_squares_GD(y_te , x_te , initial_w , max_iters , gamma)
         w,mse_tr=least_squares_GD(y_tr , x_tr , initial_w , max_iters , gamma)
     elif method == 'SGD':
-        _,mse_te=least_squares_SGD(y_te , x_te , initial_w , max_iters , gamma)
-        w,mse_tr=least_squares_SGD(y_tr , x_tr , initial_w , max_iters , gamma)
+        _,mse_te=least_squares_SGD_bis(y_te , x_te , initial_w , max_iters , gamma)
+        w,mse_tr=least_squares_SGD_bis(y_tr , x_tr , initial_w , max_iters , gamma)
     elif method == 'LS':
         _,mse_te=least_squares(y_te, x_te)
         w,mse_tr=least_squares(y_tr, x_tr)
     elif method == 'RR':
         _,mse_te=ridge_regression(y_te, x_te, lambda_)
         w,mse_tr=ridge_regression(y_tr, x_tr, lambda_)
+    elif method == 'LR':
+        _,mse_te=logistic_regression(y_te , x_te , initial_w , max_iters , gamma)
+        w,mse_tr=logistic_regression(y_tr , x_tr , initial_w , max_iters , gamma)
     else:
         raise SyntaxWarning
         
@@ -80,9 +83,9 @@ def cross_validation(y, x, k_indices, k,method, initial_w, max_iters, gamma, lam
 
     return loss_tr, loss_te
 
-def cross_validation_GD_SGD(y, x, k_fold, max_degree,gamma, max_iters,method):
+def cross_validation_GD_SGD_LR(y, x, k_fold, max_degree,gamma, max_iters,method):
     """"Cross validation for gradient descent to find best degree and gamma"""
-    if method != 'SGD' and method != 'GD':
+    if method != 'SGD' and method != 'GD' and method !='LR':
         raise SyntaxWarning
     lambda_=0
     seed = 1

@@ -22,6 +22,18 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
         loss = compute_loss(minibatch_y, minibatch_tx, w)
     return w,loss
 
+def least_squares_SGD_bis(y, tx, initial_w, max_iters, gamma):
+    """Stochastic gradient descent algorithm."""
+    w = initial_w
+    for n_iter in range(max_iters):
+        i=np.random.randint(0,tx.shape[0])
+        minibatch_y=np.array(y[i])
+        minibatch_tx=tx[i,:]
+        gradient = compute_gradient_SGD(minibatch_y, minibatch_tx, w)
+        w = w-gamma*gradient
+        loss = compute_loss_SGD(minibatch_y, minibatch_tx, w)
+    return w,loss
+
 def least_squares(y, tx):
     """Least square using normal equations."""
     gram=tx.T.dot(tx)
@@ -45,7 +57,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         grad=calculate_gradient_LR(y,tx,w)
         w -= gamma*grad
         losses.append(loss)
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < treshold:
             break
     return w,loss
 
@@ -57,25 +69,7 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         loss,grad=reg_logistic_regression_help(y,tx,w,lambda_)
         w -= gamma*grad
         losses.append(loss)
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < treshold:
             break
     return w,loss
 
-def reg_logistic_regression_help(y, tx, w, lambda_):
-    num_samples=y.shape[0]
-    loss=calculate_loss_LR(y,tx,w)+lambda_*squeeze(w.T.dit(w))
-    gradient=calculate_gradient_LR(y,tx,w)+2*lambda_*w
-    return loss,gradient
-
-def sigmoid(t):
-    return 1.0/(1+np.exp(-t))
-
-def calculate_loss_LR(y, tx, w):
-    pred=sigmoid(tx.dot(w))
-    loss=y.T.dot(np.log(pred)) + (1-y).T.dot(np.log(1-pred))
-    return np.squeeze(- loss)
-
-def calculate_gradient_LR(y,tx,w):
-    pred=sigmoid(tx.dot(w))
-    grad=tx.T.dot(pred-y)
-    return grad

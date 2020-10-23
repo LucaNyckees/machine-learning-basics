@@ -7,11 +7,21 @@ def compute_loss(y, tx, w):
     e=y-tx.dot(w)
     return e.dot(e)/(2*len(e))
 
+def compute_loss_SGD(y, tx, w):
+    """Compute the MSE"""
+    e=y-tx.dot(w)
+    return e*e/2
+
 def compute_gradient(y, tx, w):
     """Compute the gradient"""
     e = y - np.dot(tx,w)
     N= y.shape[0]
     return -np.dot(e,tx)/N
+
+def compute_gradient_SGD(y, tx, w):
+    """Compute the gradient"""
+    e = y - np.dot(tx,w)
+    return -e*tx
 
 def build_poly(x, degree):
     """Polynomial basis functions for input data x, for j=0 up to j=degree."""
@@ -19,7 +29,6 @@ def build_poly(x, degree):
     for deg in range(1,degree+1):
         poly = np.c_[poly,np.power(x,deg)]
     return poly
-
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """
@@ -44,4 +53,23 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         start_index = batch_num * batch_size
         end_index = min((batch_num + 1) * batch_size, data_size)
         if start_index != end_index:
-            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
+            yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]           
+            
+def reg_logistic_regression_help(y, tx, w, lambda_):
+    num_samples=y.shape[0]
+    loss=calculate_loss_LR(y,tx,w)+lambda_*squeeze(w.T.dit(w))
+    gradient=calculate_gradient_LR(y,tx,w)+2*lambda_*w
+    return loss,gradient
+
+def sigmoid(t):
+    return 1.0/(1+np.exp(-t))
+
+def calculate_loss_LR(y, tx, w):
+    pred=sigmoid(tx.dot(w))
+    loss=y.T.dot(np.log(pred)) + (1-y).T.dot(np.log(1-pred))
+    return np.squeeze(- loss)
+
+def calculate_gradient_LR(y,tx,w):
+    pred=sigmoid(tx.dot(w))
+    grad=tx.T.dot(pred-y)
+    return grad
