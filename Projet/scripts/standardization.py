@@ -37,3 +37,13 @@ def standardize_x_te(x,mean_x,std_x):
         x[:,i] = x[:,i] / std_x[i]
 
     return x
+
+def arrangement(x)
+    for i in range (0,x.shape[1]):
+        
+        #Replace -999 by the mean of the train set
+        x[:,i][x[:,i]==-999] = mean_x[i]
+        
+    x_0,x_1,x_23=split(data)
+    
+    return x_0,x_1,x_23
