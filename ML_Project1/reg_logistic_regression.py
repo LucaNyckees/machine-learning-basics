@@ -9,14 +9,14 @@ def reg_calculate_gradient(y, tx, lambda_, w):
         g=g-y[i]*xi
         product=sigmoid(xi.T.dot(w))
         g=g+xi.dot(product)
-    g=g+0.5*lambda_*w
+    g=g-0.5*lambda_*w
     return g
 
 
 def reg_learning_by_gradient_descent(y, tx, lambda_, w, gamma):
     w_new=w-gamma*reg_calculate_gradient(y, tx, lambda_, w)
     loss=compute_loss(y,tx,w_new)
-    return w,loss
+    return w_new,loss
 
 
 def de_standardize(x, mean_x, std_x):
