@@ -12,7 +12,7 @@ Clarisse Schumer
 
 ### Files
 `ML_Project1/Projet/scripts`contains some `.py` files, including the following :
-  - `helper_implementations.py`, defining the basic tools used in...
+  - `helper_implementations.py`, defining the basic tools used in `implementations.py`,
   - `implementations.py`, where the main machine learning algorithms are implemented,
   - `cleaning_data.py`, where we treat the data (splitting methods, standardization, taking outliers into account),
   - `cross_validation.py`, where we set some important cross-validation methods to optimize the choice of hyperparameters.
