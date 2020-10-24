@@ -11,7 +11,7 @@ Clarisse Schumer
 * `Matplotlib`
 
 ### Files
-`ML_Project1/Projet/scripts`contains some `.py` files, including the following :
+`ML_Project1/Projet/scripts`contains some `.py` and `.ipynb` files, including the following :
   - `helper_implementations.py`, defining the basic tools used in `implementations.py`,
   - `implementations.py`, where the main machine learning algorithms are implemented,
   - `cleaning_data.py`, where we treat the data (splitting methods, standardization, taking outliers into account),
