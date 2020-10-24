@@ -2,8 +2,8 @@
 ## The Higgs Boson Project
 
 ### Team members
-Raphaël Mirallié
-Luca Nyckees
+Raphaël Mirallié\
+Luca Nyckees\
 Clarisse Schumer
 
 ### Requirements
@@ -21,7 +21,7 @@ Clarisse Schumer
   - Some notebooks found at the extension `ML_Project1/Projet/scripts/.ipynb_checkpoints`, where all implemented methods are put to use and the producing of the prediction files takes place.
   
 ### Contact us
-raphael.mirallie@epfl.ch
-luca.nyckees@epfl.ch
+raphael.mirallie@epfl.ch\
+luca.nyckees@epfl.ch\
 clarisse.schumer@epfl.ch
 
