@@ -4,7 +4,7 @@
 For anything to work in this project, please make sure to download the data from https://www.kaggle.com/c/higgs-boson and upload it in the main (and only) folder of the project under the name : **'train.csv'** and **'test.csv'**.
 
 ## Project structure
-
+'''
 ML_Project_1
 ├── submit.ipynb                    #Detailed notebook on how to create a submission file and cross-validate the hyperparameters
 ├── clean_data.py                   #Functions used to adapt the data to the need of machine learning's method
@@ -15,16 +15,16 @@ ML_Project_1
 ├── implementations.py              #Six different machine learning method
 ├── ReadMe.md
 └── run.py                          #Script to produce a submission file with our best model
-
+'''
 ## Ideas
 
 
 ## Team members
-*Raphaël Mirallié
-*Luca Nyckees
-*Clarisse Schumer
+Raphaël Mirallié
+Luca Nyckees
+Clarisse Schumer
 
 ### Contact us
-*raphael.mirallie@epfl.ch
-*luca.nyckees@epfl.ch
-*clarisse.schumer@epfl.ch
+raphael.mirallie@epfl.ch
+luca.nyckees@epfl.ch
+clarisse.schumer@epfl.ch
