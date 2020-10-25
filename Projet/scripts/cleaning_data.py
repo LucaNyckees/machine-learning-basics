@@ -57,7 +57,7 @@ def label(w_0,w_1,w_23,x_0,x_1,x_23,data,choice):
     return y
 
 def adapt_x(x, deg):
-    """Adapt the data by spliting it and exand it with the polynomial basis"""
+    """Adapt the data by spliting it and expand it with the polynomial basis"""
     #Replace the -999 in the first column by the mean (without the -999)
     x[:, 0][x[:, 0] == -999.0] = np.mean(x[:, 0][x[:, 0] != -999.0])
     

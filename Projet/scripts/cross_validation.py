@@ -21,7 +21,7 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-
+#The below function will plot a boxplot of the accuracy of the least square method with respect to the degree of the polynomial expansion
 def cross_val_LS(y,x,k_fold,max_degree):
     """Cross validation for the polynomial expansion of the featres for least_squares"""
    
@@ -61,14 +61,16 @@ def cross_val_LS(y,x,k_fold,max_degree):
             
         #Saving the accuracy for each degree    
         accuracies.append(accuracies_tmp)
-        print(accuracies)
-            
+    
+    #Printing the result in boxplot form
     plt.boxplot(accuracies)
     plt.title('Train error distribution')
     plt.xlabel('degree')
     plt.ylabel('accuracy')
     plt.savefig("cross_validation_LS")
-    return 
+
+#The below function will return a max_degree*len(gamma)*2 array where the element [d,i,0] is the mean of the accuracy on the k folds for degree d and gamma gamma[i] and [d,i,1] is the std of the accuracy on the k folds for degree d and gamma[i]
+#This hold for the logistic regression method and the degree d is the degree of the polynomial expansion
 
 def cross_val_Log(y,x,k_fold,max_degree,gamma):
     """Cross validation for the polynomial expansion of the featres for logistic_regression"""
@@ -78,15 +80,12 @@ def cross_val_Log(y,x,k_fold,max_degree,gamma):
     max_iters = 50
     degrees = np.arange(1,max_degree+1)
     k_indices = build_k_indices(y,k_fold,seed)
-    accuracies = []
+    mean_std=np.zeros((max_degree,len(gamma),2))
     
     #Cross validation
     for d in degrees:
-        print('d',d)
-        accuracies_tmp = []
-        for j in gamma:
-            print('j',j)
-            accuracies_tmp_tmp = []
+        for index,j in enumerate(gamma):
+            accuracies = []
             for i in range(k_fold):
                 
                 #Spliting the data in k-1 train folds and 1 test fold
@@ -110,14 +109,14 @@ def cross_val_Log(y,x,k_fold,max_degree,gamma):
                 #Computing the accuracy for each validation
                 y_pred = label(w_0, w_1, w_23, x_tr0, x_tr1, x_tr23, x_tr, 'logistic regression')
                 accuracy = compute_accuracy(y_tr, y_pred)
-                accuracies_tmp.append(accuracy)
+                accuracies.append(accuracy)
                 
-             #Saving the accuracy for each degree   
-            accuracies_tmp.append(accuracies_tmp_tmp)
-        accuracies.append(accuracies_tmp)
-    print(accuracies)
+            #Saving the accuracy for each degree
+            mean_std[d-1,index,0]=np.mean(accuracies)
+            mean_std[d-1,index,1]=np.std(accuracies)
+
+    return mean_std
     
-    return
 
     
     
