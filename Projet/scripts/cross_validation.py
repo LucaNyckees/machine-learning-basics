@@ -4,6 +4,9 @@
 
 import numpy as np
 from implementations import *
+from helpers import *
+from helper_implementations import *
+from cleaning_data import *
 import matplotlib.pyplot as plt
 
 
@@ -37,168 +40,118 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-
-
-def cross_validation(y, x, k_indices, k,method, initial_w, max_iters, gamma, lambda_ ,degree):
-    """Return the loss of the k th fold"""
-   
-    # get k'th subgroup in test, others in train
-    
-    te_indice = k_indices[k]
-    tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == k)]
-    tr_indice = tr_indice.reshape(-1)
-    x_te=x[te_indice]
-    y_te=y[te_indice]
-    x_tr=x[tr_indice]
-    y_tr=y[tr_indice]
-    
-    # form data with polynomial degree
-    
-    x_te=build_poly(x_te,degree)
-    x_tr=build_poly(x_tr,degree)
-
-    # Methods
-    if method == 'GD':
-        _,mse_te=least_squares_GD(y_te , x_te , initial_w , max_iters , gamma)
-        w,mse_tr=least_squares_GD(y_tr , x_tr , initial_w , max_iters , gamma)
-    elif method == 'SGD':
-        _,mse_te=least_squares_SGD(y_te , x_te , initial_w , max_iters , gamma)
-        w,mse_tr=least_squares_SGD(y_tr , x_tr , initial_w , max_iters , gamma)
-    elif method == 'LS':
-        _,mse_te=least_squares(y_te, x_te)
-        w,mse_tr=least_squares(y_tr, x_tr)
-    elif method == 'RR':
-        _,mse_te=ridge_regression(y_te, x_te, lambda_)
-        w,mse_tr=ridge_regression(y_tr, x_tr, lambda_)
-    elif method == 'LR':
-        _,mse_te=logistic_regression(y_te , x_te , initial_w , max_iters , gamma)
-        w,mse_tr=logistic_regression(y_tr , x_tr , initial_w , max_iters , gamma)
-    else:
-        raise SyntaxWarning
-        
-    # calculate the loss for train and test data
-    
-    loss_te=compute_loss(y_te,x_te,w)
-    loss_tr=compute_loss(y_tr,x_tr,w)
-
-    return loss_tr, loss_te
-
-def cross_validation_GD_SGD_LR(y, x, k_fold, max_degree,gamma, max_iters,method):
-    """"Cross validation for gradient descent to find best degree and gamma"""
-    if method != 'SGD' and method != 'GD' and method !='LR':
-        raise SyntaxWarning
-    lambda_=0
+def cross_val_LS(y,x,k_fold,max_degree):
     seed = 1
     degrees = np.arange(1,max_degree+1)
-    best_gamma = []
-    best_rmses = []
     
-    # split data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
+    k_indices = build_k_indices(y,k_fold,seed)
+    #Cross validation
     for d in degrees:
-        print('degree = ',d)
-        initial_w=np.zeros(x.shape[1]*d+1)
-        # define lists to store the loss of training data and test data
-        rmse_tr = []
-        rmse_te = []
-        # cross validation
-        for i in gamma:
-            print('nb gamma = ',i)
-            rmse_tr_tmp = []
-            rmse_te_tmp = []
-            for k in range(k_fold):
-                loss_tr, loss_te=cross_validation(y,x,k_indices,k,method,initial_w,max_iters,i,lambda_,d)
-                rmse_tr_tmp.append(loss_tr)
-                rmse_te_tmp.append(loss_te)
-            rmse_tr.append(np.mean(rmse_tr_tmp))
-            rmse_te.append(np.mean(rmse_te_tmp))
-        #grid search for the best hyperparameters
-        ind_gamma_opt = np.argmin(rmse_te)
-        best_gamma.append(gamma[ind_gamma_opt])
-        best_rmses.append(rmse_te[ind_gamma_opt])
-        
-        
-    ind_best_degree=np.argmin(best_rmses)
+        print(d)
     
-    return degrees[ind_best_degree], best_gamma[ind_best_degree]
-
-
-
-def cross_validation_LS(y,x,k_fold,max_degree):
-    """"Cross validation for least square with normal equations to find best degree"""
-    seed = 1
-    initial_w=0
-    max_iters=0
-    gamma=0
-    lambda_=0
-    degrees = np.arange(1,max_degree+1)
-    # split data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
-    # define lists to store the loss of training data and test data
-    rmse_tr = []
-    rmse_te = []
-    # cross validation
-    for d in degrees:
-        print('degree = ',d)
-        rmse_tr_tmp = []
-        rmse_te_tmp = []
-        for k in range(k_fold):
-            loss_tr, loss_te=cross_validation(y, x, k_indices, k,'LS', initial_w, max_iters, gamma, lambda_,d)
+        for i in range(k_fold):
+            te_indice = k_indices[i]
+            tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == i)]
+            tr_indice = tr_indice.reshape(-1)
+            x_te=x[te_indice]
+            y_te=y[te_indice]
+            x_tr=x[tr_indice]
+            y_tr=y[tr_indice]
+            rmse_tr = []
+            rmse_te = []
+            
+            x_tr0, x_tr1, x_tr23 = adapt_x(x_tr, d)
+            y_tr0, y_tr1, y_tr23 = adapt_y_least_squares(y_tr, x_tr)
+           
+        
+            w_0,_ = least_squares(y_tr0, x_tr0)
+            w_1,_ = least_squares(y_tr1, x_tr1)
+            w_23,_ = least_squares(y_tr23, x_tr23)
+            
+            y_pred = label(w_0,w_1,w_23,x_tr0,x_tr1,x_tr23,x_tr,'least squares')
+            
+            w = np.concatenate((np.concatenate((w_0, w_1), axis=None),w_23),axis=None)
+            
+            # Calculate the loss for train an test data
+            print('y_te ',y_te.shape)
+            print('x_te ',x_te.shape)
+            print('w ',w.shape)
+            
+            loss_te=compute_loss(y_te,x_te,w)
+            loss_tr=compute_loss(y_tr,x_tr,w)
+        
             rmse_tr_tmp.append(loss_tr)
             rmse_te_tmp.append(loss_te)
+        
         rmse_tr.append(np.mean(rmse_tr_tmp))
         rmse_te.append(np.mean(rmse_te_tmp))
         
-    #grid search for the best hyperparameters
+    
     index_best_degree=np.argmin(rmse_te)
     
     cross_validation_visualization(degrees, rmse_tr, rmse_te,'semilogy')
     
     return degrees[index_best_degree]
 
-def cross_validation_RR(y, x, k_fold, max_degree, lambdas):
-    """"Cross validation for ridge regression to find best degree and lambda"""
-
+def cross_val_Log(y,x,k_fold,max_degree,max_iters,gamma):
     seed = 1
-    initial_w=0
-    max_iters=0
-    gamma=0
+    
     degrees = np.arange(1,max_degree+1)
-   
+    k_indices = build_k_indices(y,k_fold,seed)
     best_lambdas = []
     best_rmses = []
     
-    # split data in k fold
-    k_indices = build_k_indices(y, k_fold, seed)
     for d in degrees:
-        print('degree = ',d)
         initial_w=np.zeros(x.shape[1]*d+1)
-        # define lists to store the loss of training data and test data
         rmse_tr = []
         rmse_te = []
-        # cross validation
-        for i in lambdas:
-            print('nb gamma = ',i)
+        for j in gamma:
             rmse_tr_tmp = []
             rmse_te_tmp = []
-            for k in range(k_fold):
-                loss_tr, loss_te=cross_validation(y,x,k_indices,k,'RR',initial_w,max_iters,gamma,i,d)
+            for i in range(k_fold):
+                te_indice = k_indices[i]
+                tr_indice = k_indices[~(np.arange(k_indices.shape[0]) == i)]
+                tr_indice = tr_indice.reshape(-1)
+                x_te=x[te_indice]
+                y_te=y[te_indice]
+                x_tr=x[tr_indice]
+                y_tr=y[tr_indice]
+           
+                #Split the data points
+                y_tr0, y_tr1, y_tr23 = adapt_y_logistic_regression(y_tr, x_tr)
+                x_tr0, x_tr1, x_tr23 = adapt_x(x_tr, d)
+                
+                # Do the logistic regession for each split
+                w_0,_ = logistic_regression(y_tr0, x_tr0,initial_w,max_iters,gamma)
+                w_1,_ = logistic_regression(y_tr1, x_tr1,initial_w,max_iters,gamma)
+                w_23,_ = logistic_regression(y_tr23, x_tr23,initial_w,max_iters,gamma)
+       
+                y_pred = label(w_0,w_1,w_23,x_t0,x_t1,x_t23,data,'logistic regression')
+                w = np.concatenate((np.concatenate((w_0, w_1), axis=None),w_23),axis=None)
+                
+                # Calculate the loss for train and test data
+                loss_te=compute_loss(y_te,x_te,w)
+                loss_tr=compute_loss(y_tr,x_tr,w)
+        
                 rmse_tr_tmp.append(loss_tr)
                 rmse_te_tmp.append(loss_te)
+        
             rmse_tr.append(np.mean(rmse_tr_tmp))
             rmse_te.append(np.mean(rmse_te_tmp))
-        #grid search for the best hyperparameters
-        ind_lambda_opt = np.argmin(rmse_te)
-        best_lambdas.append(lambdas[ind_lambda_opt])
-        best_rmses.append(rmse_te[ind_lambda_opt])
-        
-        
-    ind_best_degree=np.argmin(best_rmses)
-    
-    return degrees[ind_best_degree], best_lambdas[ind_best_degree]
+        #Grid seach for the best hyperparameters
+        ind_gamma_opt = np.argmin(rmse_te)
+        best_gamma.append(gamma[ind_gamma_opt])
+        best_rmses.append(rmse_te[ind_gamma_opt])
     
    
+    
+    ind_best_degree=np.argmin(best_rmses)
+    
+    return degrees[ind_best_degree], best_gamma[ind_best_degree]
 
+
+    
+    
 
 
 

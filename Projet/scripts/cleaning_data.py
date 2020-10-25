@@ -17,60 +17,38 @@ def split_x(x):
     x_23 = x[(x[:, 22] > 1)]
     return x_0, x_1, x_23
 
-# Return binary values -1,1 which gives the 
-
-def label_regression(w_0,w_1,w_23,x_0,x_1,x_23,data):
+def label(w_0,w_1,w_23,x_0,x_1,x_23,data,choice):
 
     id_ = np.arange(data.shape[0])
     id0=id_[data[:,22] == 0]
     y_0=np.dot(x_0,w_0)
-
-    id1=id_[data[:,22]==1]
-    y_1=np.dot(x_1,w_1)
-
-    id23=id_[data[:,22] > 1]
-    y_23 = np.dot(x_23,w_23)
-
-    ypred = np.concatenate((np.concatenate((y_0, y_1), axis=None),y_23),axis=None)
-    id_ = np.concatenate((np.concatenate((id0, id1), axis=None),id23),axis=None)
-    y = np.transpose(np.array([id_,ypred]))
-    y = y[y[:,0].argsort()][:,1]
-    y[np.where(y <= 0)] = -1
-    y[np.where(y > 0)] = 1
-    return y
-
-
-#Return binary values -1,1 for the logistic regression 
-def label_log(w_0,w_1,w_23,data):
-
-    id_ = np.arange(data.shape[0])
-    x_0,x_1,x_23=arrangement(data)
-    id0=id_[data[:,22] == 0]
-    y_0=np.dot(x_0,w_0)
-
-    id1=id_[data[:,22]==1]
-    y_1=np.dot(x_1,w_1)
-
-    id23=id_[data[:,22] > 1]
-    y_23 = np.dot(x_23,w_23)
-
-    ypred = np.concatenate((np.concatenate((y_0, y_1), axis=None),y_23),axis=None)
-    id_ = np.concatenate((np.concatenate((id0, id1), axis=None),id23),axis=None)
-    y = np.transpose(np.array([id_,ypred]))
-    y = y[y[:,0].argsort()][:,1]
-    y[np.where(y <= 0.5)] = -1
-    y[np.where(y > 0.5)] = 1
-    return y
-
-def arrangement(x):
-    for i in range (0,x.shape[1]):
-        
-        #Replace -999 by the mean of the train set
-         x[:, 0][x[:, 0] == -999.0] = np.mean(x[:, 0][x[:, 0] != -999.0])
-        
-    x_0,x_1,x_23=split_x(x)
     
-    return x_0,x_1,x_23
+
+    id1=id_[data[:,22]==1]
+    y_1=np.dot(x_1,w_1)
+    
+    
+    id23=id_[data[:,22] > 1]
+    y_23 = np.dot(x_23,w_23)
+
+    
+    ypred = np.concatenate((np.concatenate((y_0, y_1), axis=None),y_23),axis=None)
+    id_ = np.concatenate((np.concatenate((id0, id1), axis=None),id23),axis=None)
+    y = np.transpose(np.array([id_,ypred]))
+    y = y[y[:,0].argsort()][:,1]
+    
+    
+    if choice=='least squares':
+        y[np.where(y <= 0)] = -1
+        y[np.where(y > 0)] = 1
+    elif choice=='logistic regression':
+        y[np.where(y <= 0.5)] = -1
+        y[np.where(y > 0.5)] = 1
+    else:
+        raise SyntaxWarning
+        
+   
+    return y
 
 def standardize(x):
     """Standardize the original data set."""
@@ -80,7 +58,7 @@ def standardize(x):
     x = x / std_x
     return x, mean_x, std_x
 
-def adapt_x_least_squares(x, deg):
+def adapt_x(x, deg):
     #Replace the -999 in the first column by the mean (without the -999)
     x[:, 0][x[:, 0] == -999.0] = np.mean(x[:, 0][x[:, 0] != -999.0])
     
@@ -88,9 +66,9 @@ def adapt_x_least_squares(x, deg):
     x_0, x_1, x_23 = split_x(x)
     
     #Standardization
-    x_0, x_0_mean, x_0_std = standardize(x_0)
-    x_1, x_1_mean, x_1_std = standardize(x_1)
-    x_23, x_23_mean, x_23_std = standardize(x_23)
+    x_0, _, _ = standardize(x_0)
+    x_1, _, _ = standardize(x_1)
+    x_23, _, _ = standardize(x_23)
     
     #Polynomial expansion
     x_0=build_poly(x_0,deg)
@@ -109,6 +87,16 @@ def adapt_y_least_squares(y, x):
     #Split the data w.r.t. the number of jets 
     y_0, y_1, y_23 = split_y(y, x)
     
+    return y_0, y_1, y_23
+
+def adapt_y_logistic(y, x):
+
+    # For logistic regression only: bring y back to 0 and 1 -> for logistic regression #FIXME bring back
+    y = np.array([0 if i == -1 else 1 for i in y])
+    
+    # Step 2: Split data set into 3 datasets depending on jet num
+    y_0, y_1, y_23 = split_y(y, x)
+
     return y_0, y_1, y_23
 
 def compute_accuracy(y, y_prediction):

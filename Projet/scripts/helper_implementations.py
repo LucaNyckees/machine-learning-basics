@@ -23,7 +23,7 @@ def build_poly(x, degree):
             
 def reg_logistic_regression_help(y, tx, w, lambda_):
     num_samples=y.shape[0]
-    loss=calculate_loss_LR(y,tx,w)+lambda_*squeeze(w.T.dit(w))
+    loss=calculate_loss_LR(y,tx,w)+lambda_*np.squeeze(w.T.dot(w))
     gradient=calculate_gradient_LR(y,tx,w)+2*lambda_*w
     return loss,gradient
 
