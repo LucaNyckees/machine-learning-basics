@@ -39,6 +39,7 @@ def ridge_regression(y, tx, lambda_):
     return w,loss
 
 def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """Logistic regression"""
     w = initial_w
     losses=[]
     treshold=1e-8
@@ -52,6 +53,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
     return w,loss
 
 def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
+    """Regularized logistic regression"""
     w = initial_w
     losses=[]
     treshold=1e-8
