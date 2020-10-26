@@ -33,15 +33,16 @@ Some helpers are needed to make this methods works and can be foun in the file `
 
 ### Cleaning the data
 
-An important part of the project comes from the pre processing of the data.\ 
+An important part of the project comes from the pre processing of the data.\
 A lot of values in the data set are -999, corresponding to meaningless or uncomputable data. The only discret feature of the data set  **'train.csv'** and **'test.csv'** is the number of jets, that can take the value 0,1,2 or 3. These two facts are linked. Indeed, when the number of jets is 0, 10 features are always equal to -999, when it is equal to 1, 8 features are always equal to -999 and there is no specification when the number of jets is equal to 2 or 3. The only feature without any linked to the number of jets is the first column. Thus we decided to split the data in 3 parts, corresponding to the number of jets (0,1 or 2 and 3). We then standardized each part of the data and used the methods on each of this part.\
 Thus we also needed to adapt the prediction labels to the splitting of the data.\
 All of this part of the project is detailled in the file `clean_data.py`.
 
 ### Cross validation
 
-The cross validation of the hyperparameters has been explicitely coded only for the least square with normal equations and the logistic regression. However the code can be easily adapted to the others method only by changing the name of the method in `cross_validation.py`. For one parameter validation, please modify the function cross_val_LS and for two parameters validation please modify the function cross_val_Log.
-The cross_val_Log takes the raw data, the maximum degree of the polynomial extension you want to test and the different gamma you want to test (as an array) as input. The output is a max_degree\*len(gamma)\*2 array where the element [d,i,0] is the mean of the accuracy on the k folds for degree d and gamma gamma[i] and [d,i,1] is the std of the accuracy on the k folds for degree d and gamma[i]. Keep in mind that this method is quite slow and that you should consider relatively small gamma (below 10^-2) to avoid computation problem with the sigmoid function.
+The cross validation of the hyperparameters has been explicitely coded only for the least square with normal equations and the logistic regression. However the code can be easily adapted to the others method only by changing the name of the method in `cross_validation.py`. For one parameter validation, please modify the function cross_val_LS and for two parameters validation please modify the function cross_val_Log.\
+cross_val_LS takes the raw data and the maximum degree of the polynomial extension you want to test as input. The output is a boxplot of the accuracy on each fold for each degree from 1 to max_degree.\
+cross_val_Log takes the raw data, the maximum degree of the polynomial extension you want to test and the different gamma you want to test (as an array) as input. The output is a max_degree\*len(gamma)\*2 array where the element [d,i,0] is the mean of the accuracy on the k folds for degree d and gamma gamma[i] and [d,i,1] is the std of the accuracy on the k folds for degree d and gamma[i]. Keep in mind that this method is quite slow.
 
 ### submit.ipynb
 
