@@ -33,7 +33,10 @@ Some helpers are needed to make this methods works and can be foun in the file `
 
 ### Cleaning the data
 
-An important part of the project comes from the pre processing of the data.\ A lot of values in the data set are -999, corresponding to meaningless or uncomputable data. The only discret feature of the data set  **'train.csv'** and **'test.csv'** is the number of jets, that can take the value 0,1,2 or 3. These two facts are linked. Indeed, when the number of jets is 0, 10 features are always equal to -999, when it is equal to 1, 8 features are always equal to -999 and there is no specification when the number of jets is equal to 2 or 3. The only feature without any linked to the number of jets is the first column. Thus we decided to split the data in 3 parts, corresponding to the number of jets (0,1 or 2 and 3). We then standardized each part of the data and used the methods on each of this part.\ Thus we also needed to adapt the prediction labels to the splitting of the data. All of this part of the project is detailled in the file `clean_data.py`.
+An important part of the project comes from the pre processing of the data.\ 
+A lot of values in the data set are -999, corresponding to meaningless or uncomputable data. The only discret feature of the data set  **'train.csv'** and **'test.csv'** is the number of jets, that can take the value 0,1,2 or 3. These two facts are linked. Indeed, when the number of jets is 0, 10 features are always equal to -999, when it is equal to 1, 8 features are always equal to -999 and there is no specification when the number of jets is equal to 2 or 3. The only feature without any linked to the number of jets is the first column. Thus we decided to split the data in 3 parts, corresponding to the number of jets (0,1 or 2 and 3). We then standardized each part of the data and used the methods on each of this part.\
+Thus we also needed to adapt the prediction labels to the splitting of the data.\
+All of this part of the project is detailled in the file `clean_data.py`.
 
 ### Cross validation
 
