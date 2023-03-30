@@ -98,8 +98,8 @@ All of this part of the project is detailled in the file `clean_data.py`.
 ### Cross validation
 
 The cross validation of the hyperparameters has been explicitely coded only for the least square with normal equations and the logistic regression. However the code can be easily adapted to the others method only by changing the name of the method in `cross_validation.py`. For one parameter validation, please modify the function cross_val_LS and for two parameters validation please modify the function cross_val_Log.\
-cross_val_LS takes the raw data and the maximum degree of the polynomial extension you want to test as input. The output is a boxplot of the accuracy on each fold for each degree from 1 to max_degree.\
-cross_val_Log takes the raw data, the maximum degree of the polynomial extension you want to test and the different gamma you want to test (as an array) as input. The output is a max_degree\*len(gamma)\*2 array where the element [d,i,0] is the mean of the accuracy on the k folds for degree d and gamma gamma[i] and [d,i,1] is the std of the accuracy on the k folds for degree d and gamma[i]. Keep in mind that this method is quite slow.
+cross_val_LS takes the raw data and the maximum degree of the polynomial extension you want to test as input. The output is a boxplot of the accuracy on each fold for each degree from 1 to `max_degree`.\
+cross_val_Log takes the raw data, the maximum degree of the polynomial extension you want to test and the different gamma you want to test (as an array) as input. The output is a `max_degree`\*len(gamma)\*2 array where the element `[d,i,0]` is the mean of the accuracy on the $k$ folds for degree d and `gamma` `gamma[i]` and `[d,i,1]` is the std of the accuracy on the $k$ folds for degree d and `gamma[i]`. Keep in mind that this method is quite slow.
 
 ### submit.ipynb
 
